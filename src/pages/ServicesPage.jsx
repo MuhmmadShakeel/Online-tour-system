@@ -1,6 +1,6 @@
 import React from 'react'
-import ServiceHead from '../component/services/ServiceHead'
-import OurAllServices from '../component/services/OurAllServices'
+import ServiceHead from '../component/usercomponents/services/ServiceHead'
+import OurAllServices from '../component/usercomponents/services/OurAllServices'
 
 function ServicesPage() {
   return (
