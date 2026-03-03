@@ -119,6 +119,13 @@ function Navbar() {
             Contact
           </Link>
           <Link
+            to="/tour"
+            onClick={() => setIsOpen(false)}
+            className="block px-3 py-2 rounded-md hover:bg-[#FFAA00] hover:text-[#237227] transition-colors duration-200"
+          >
+            Tours
+          </Link>
+          <Link
             to="/login"
             onClick={() => setIsOpen(false)}
             className="block px-3 py-2 rounded-md bg-[#FFAA00] text-[#237227] font-semibold hover:bg-yellow-400 transition-colors duration-200"
