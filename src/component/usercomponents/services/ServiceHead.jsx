@@ -2,7 +2,7 @@ import React, { useEffect } from "react";
 import AOS from "aos";
 import "aos/dist/aos.css";
 import { ShieldCheck, Zap, BarChart3 } from "lucide-react";
-
+import visitvideo from '../../../assets/media/visitvideo.mp4'
 function ServiceHead() {
   useEffect(() => {
     AOS.init({
@@ -90,11 +90,14 @@ function ServiceHead() {
             data-aos="fade-left"
           >
             <div className="relative z-10 rounded-[1.5rem] overflow-hidden shadow-xl border-[8px] border-white">
-              <img
-                src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=1200&auto=format&fit=crop"
-                alt="Modern Office Service"
-                className="w-full h-[360px] object-cover grayscale-[0.1] hover:grayscale-0 transition-all duration-700"
-              />
+              <video
+    src={visitvideo}
+    autoPlay
+    muted
+    loop
+    playsInline
+    className="w-full h-[360px] object-cover grayscale-[0.1] hover:grayscale-0 transition-all duration-700t"
+  />
             </div>
 
             {/* Floating Card */}

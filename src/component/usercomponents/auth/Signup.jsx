@@ -1,99 +1,185 @@
-import React, { useEffect } from "react";
+import React, { useEffect, useState } from "react";
 import { User, Mail, Lock, UserPlus } from "lucide-react";
-import { Link } from "react-router-dom";
+import { Link, useNavigate } from "react-router-dom";
+import { useSignUpMutation } from "../../../redux/api/AuthApi";
+import toast from "react-hot-toast";
 import AOS from "aos";
 import "aos/dist/aos.css";
 
 function Signup() {
+  const navigate = useNavigate();
+  const [signUp, { isLoading }] = useSignUpMutation();
+
+  const [formData, setFormData] = useState({
+    name: "",
+    email: "",
+    password: "",
+  });
+
   useEffect(() => {
     AOS.init({
       duration: 800,
-      easing: "ease-in-out",
       once: true,
     });
   }, []);
 
+  const handleChange = (e) => {
+    setFormData({
+      ...formData,
+      [e.target.name]: e.target.value,
+    });
+  };
+
+  // 🔥 Professional Toast Styles
+  const showSuccessToast = (message) => {
+    toast.success(message, {
+      duration: 3500,
+      position: "top-right",
+      style: {
+        borderRadius: "14px",
+        background: "#111827",
+        color: "#fff",
+        padding: "14px 16px",
+        fontSize: "14px",
+        fontWeight: "500",
+      },
+      iconTheme: {
+        primary: "#22c55e",
+        secondary: "#ffffff",
+      },
+    });
+  };
+
+  const showErrorToast = (message) => {
+    toast.error(message, {
+      duration: 4000,
+      position: "top-right",
+      style: {
+        borderRadius: "14px",
+        background: "#1f2937",
+        color: "#fff",
+        padding: "14px 16px",
+        fontSize: "14px",
+        fontWeight: "500",
+      },
+      iconTheme: {
+        primary: "#ef4444",
+        secondary: "#ffffff",
+      },
+    });
+  };
+
+  const handleSubmit = async (e) => {
+    e.preventDefault();
+
+    if (!formData.name || !formData.email || !formData.password) {
+      return showErrorToast("All fields are required");
+    }
+
+    try {
+      const response = await signUp(formData).unwrap();
+
+      showSuccessToast(
+        response.message || "Account created successfully 🎉"
+      );
+
+      setFormData({ name: "", email: "", password: "" });
+
+      setTimeout(() => {
+        navigate("/login");
+      }, 1500);
+
+    } catch (error) {
+      showErrorToast(
+        error?.data?.message ||
+          "Unable to create account. Please try again."
+      );
+    }
+  };
+
   return (
-    <div className="h-screen flex items-center justify-center bg-gray-50 overflow-hidden">
-      <div 
+    <div className="h-screen flex items-center justify-center bg-gradient-to-br from-gray-50 to-gray-100">
+      <div
         data-aos="fade-up"
-        className="w-full max-w-md bg-white rounded-2xl shadow-xl p-6 sm:p-8 border border-gray-100"
+        className="w-full max-w-md bg-white rounded-2xl shadow-xl p-8 border border-gray-100"
       >
-        <div className="text-center space-y-4 mb-8">
-          <div className="inline-flex items-center justify-center w-12 h-12 rounded-xl bg-[#FFAA00]/10 text-[#FFAA00] mb-2">
-            <span className="text-xl font-bold">OT</span>
+        {/* Header */}
+        <div className="text-center mb-8">
+          <div className="w-14 h-14 mx-auto flex items-center justify-center rounded-xl bg-[#FFAA00]/10 text-[#FFAA00] mb-3">
+            <UserPlus className="h-6 w-6" />
           </div>
-          <h2 className="text-2xl font-bold text-gray-900 tracking-tight">
-            Get Started
+          <h2 className="text-2xl font-bold text-gray-900">
+            Create Account
           </h2>
-          <p className="text-sm text-gray-500">
-            Create your account now to start your journey.
+          <p className="text-sm text-gray-500 mt-1">
+            Join us and start your journey today
           </p>
         </div>
 
-        <form className="space-y-6" onSubmit={(e) => e.preventDefault()}>
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700 block">
-              Full Name
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <User className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="text"
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-[#FFAA00] focus:border-transparent outline-none transition-all duration-200"
-                placeholder="John Doe"
-              />
-            </div>
+        {/* Form */}
+        <form className="space-y-5" onSubmit={handleSubmit}>
+          {/* Name */}
+          <div className="relative">
+            <User className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+            <input
+              type="text"
+              name="name"
+              value={formData.name}
+              onChange={handleChange}
+              required
+              placeholder="Full Name"
+              className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#FFAA00] outline-none transition"
+            />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700 block">
-              Email Address
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Mail className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="email"
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-[#FFAA00] focus:border-transparent outline-none transition-all duration-200"
-                placeholder="name@company.com"
-              />
-            </div>
+          {/* Email */}
+          <div className="relative">
+            <Mail className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+            <input
+              type="email"
+              name="email"
+              value={formData.email}
+              onChange={handleChange}
+              required
+              placeholder="Email Address"
+              className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#FFAA00] outline-none transition"
+            />
           </div>
 
-          <div className="space-y-2">
-            <label className="text-sm font-semibold text-gray-700 block">
-              Password
-            </label>
-            <div className="relative">
-              <div className="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                <Lock className="h-5 w-5 text-gray-400" />
-              </div>
-              <input
-                type="password"
-                className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 text-gray-900 text-sm rounded-xl focus:ring-2 focus:ring-[#FFAA00] focus:border-transparent outline-none transition-all duration-200"
-                placeholder="Create a password"
-              />
-            </div>
+          {/* Password */}
+          <div className="relative">
+            <Lock className="absolute left-3 top-3.5 h-5 w-5 text-gray-400" />
+            <input
+              type="password"
+              name="password"
+              value={formData.password}
+              onChange={handleChange}
+              required
+              placeholder="Create Password"
+              className="w-full pl-10 pr-4 py-3 bg-gray-50 border border-gray-200 rounded-xl text-sm focus:ring-2 focus:ring-[#FFAA00] outline-none transition"
+            />
           </div>
 
+          {/* Button */}
           <button
             type="submit"
-            className="w-full flex items-center justify-center py-3 px-4 rounded-xl text-sm font-semibold text-white bg-[#FFAA00] hover:bg-[#e69900] focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-[#FFAA00] transition-all duration-200 shadow-md hover:shadow-lg transform active:scale-[0.98]"
+            disabled={isLoading}
+            className="w-full py-3 rounded-xl text-sm font-semibold text-white bg-[#FFAA00] hover:bg-[#e69900] transition shadow-md active:scale-95 disabled:opacity-60 disabled:cursor-not-allowed"
           >
-            Create Account <UserPlus className="ml-2 h-4 w-4" />
+            {isLoading ? "Creating..." : "Create Account"}
           </button>
-
-          <p className="text-center text-sm text-gray-500 pt-2">
-            Already have an account?{" "}
-            <Link to="/login" className="font-semibold text-[#FFAA00] hover:text-[#e69900] transition-colors">
-              Sign in here
-            </Link>
-          </p>
         </form>
+
+        {/* Footer */}
+        <p className="text-center text-sm text-gray-500 mt-6">
+          Already have an account?{" "}
+          <Link
+            to="/login"
+            className="font-semibold text-[#FFAA00] hover:text-[#e69900]"
+          >
+            Sign in
+          </Link>
+        </p>
       </div>
     </div>
   );

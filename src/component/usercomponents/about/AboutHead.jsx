@@ -16,7 +16,7 @@ function AboutHead() {
       
       {/* Professional Background Image */}
       <img
-        src="https://images.unsplash.com/photo-1497366216548-37526070297c?q=80&w=2000&auto=format&fit=crop"
+        src="https://i.pinimg.com/1200x/16/76/27/167627373ce2ece70c2158bc08ca9c5f.jpg"
         alt="Office Management System"
         className="absolute inset-0 w-full h-full object-cover grayscale-[0.1]"
       />

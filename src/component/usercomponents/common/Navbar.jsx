@@ -1,7 +1,16 @@
-import React, { useState, useEffect } from "react";
-import { Link, useLocation } from "react-router-dom";
-import { Menu, X, Globe, ChevronRight } from "lucide-react";
-
+import React, { useState, useEffect, useContext } from "react";
+import { Link, useLocation, useNavigate } from "react-router-dom";
+import {
+  Menu,
+  X,
+  Globe,
+  UserCircle,
+  LayoutDashboard,
+  LogOut,
+} from "lucide-react";
+import toast from "react-hot-toast";
+import { useLogoutMutation } from "../../../redux/api/AuthApi";
+import { ContextStore } from "../../../context/Context";
 const navLinks = [
   { label: "Home", to: "/" },
   { label: "About", to: "/about" },
@@ -12,122 +21,201 @@ const navLinks = [
 
 function Navbar() {
   const [isOpen, setIsOpen] = useState(false);
-  const [scrolled, setScrolled] = useState(false);
   const location = useLocation();
+  const navigate = useNavigate();
 
-  useEffect(() => {
-    const onScroll = () => setScrolled(window.scrollY > 20);
-    window.addEventListener("scroll", onScroll);
-    return () => window.removeEventListener("scroll", onScroll);
-  }, []);
+  const { isLogin, setIsLogin, user, setUser } =
+    useContext(ContextStore);
 
-  // Close mobile menu on route change
+  const [logoutApi] = useLogoutMutation();
+
   useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);
 
+  // ✅ Handle Logout Professionally
+  const handleLogout = async () => {
+    try {
+      await logoutApi().unwrap();
+
+      localStorage.removeItem("token");
+      localStorage.removeItem("user");
+
+      setIsLogin(false);
+      setUser(null);
+
+      toast.success("Logged out successfully");
+
+      navigate("/", { replace: true });
+    } catch (error) {
+      toast.error("Logout failed. Please try again.");
+    }
+  };
+
+  // ✅ Admin Dashboard Protection
+  const handleDashboardClick = (e) => {
+    if (!isLogin) {
+      e.preventDefault();
+      toast.error("Please login first");
+      return;
+    }
+
+    if (user?.role !== "admin") {
+      e.preventDefault();
+      toast.error("Access denied. Admins only.");
+    }
+  };
+
   return (
-    <nav
-      className={`fixed w-full top-0 z-50 transition-all duration-300 ${
-        scrolled
-          ? "bg-white/95 backdrop-blur-md shadow-lg shadow-slate-200/50"
-          : "bg-white/80 backdrop-blur-sm"
-      }`}
-    >
+    <nav className="fixed w-full top-0 z-50 bg-white shadow-md">
       <div className="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
         <div className="flex justify-between h-16 items-center">
           {/* Logo */}
-          <Link to="/" className="flex items-center gap-2 group">
-            <div className="w-9 h-9 rounded-xl bg-[#237227] flex items-center justify-center group-hover:scale-105 transition-transform duration-300">
+          <Link to="/" className="flex items-center gap-2">
+            <div className="w-10 h-10 rounded-lg bg-[#237227] flex items-center justify-center">
               <Globe size={18} className="text-white" />
             </div>
-            <span className="text-xl font-extrabold tracking-tight text-slate-900">
-              OTMS
+            <span className="text-xl font-extrabold tracking-tight">
+              <span className="text-[#237227]">OT</span>
+              <span className="text-[#FFAA00]">MS</span>
             </span>
           </Link>
 
-          {/* Desktop Menu */}
-          <div className="hidden md:flex items-center gap-1">
+          {/* Desktop Links */}
+          <div className="hidden md:flex items-center gap-6">
             {navLinks.map(({ label, to }) => {
               const isActive = location.pathname === to;
               return (
                 <Link
                   key={label}
                   to={to}
-                  className={`relative px-4 py-2 text-sm font-medium rounded-lg transition-all duration-300 ${
+                  className={`text-sm font-semibold transition-all duration-300 ${
                     isActive
-                      ? "text-[#237227] bg-green-50"
-                      : "text-slate-600 hover:text-[#237227] hover:bg-green-50/50"
+                      ? "text-[#237227] border-b-2 border-[#FFAA00] pb-1"
+                      : "text-[#237227] hover:text-[#FFAA00]"
                   }`}
                 >
                   {label}
-                  {isActive && (
-                    <span className="absolute bottom-0.5 left-1/2 -translate-x-1/2 w-5 h-0.5 rounded-full bg-[#237227]" />
-                  )}
                 </Link>
               );
             })}
           </div>
 
-          {/* Desktop Auth Buttons */}
-          <div className="hidden md:flex items-center gap-3">
-            <Link
-              to="/login"
-              className="px-5 py-2 text-sm font-semibold text-white bg-[#237227] rounded-full hover:bg-green-700 transition-all duration-300 shadow-sm shadow-green-200"
-            >
-              Login
-            </Link>
+          {/* Desktop Right Section */}
+          <div className="hidden md:flex items-center gap-4">
+            {!isLogin ? (
+              <>
+                <Link
+                  to="/login"
+                  className="px-4 py-2 text-sm font-semibold text-[#237227] border-2 border-[#237227] rounded-full hover:bg-[#237227] hover:text-white transition"
+                >
+                  Login
+                </Link>
+
+                <Link
+                  to="/signup"
+                  className="px-4 py-2 text-sm font-semibold text-white bg-[#FFAA00] rounded-full hover:opacity-90 transition"
+                >
+                  Signup
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/admin"
+                  onClick={handleDashboardClick}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#237227] rounded-full hover:opacity-90 transition"
+                >
+                  <LayoutDashboard size={16} />
+                  Dashboard
+                </Link>
+
+                <Link
+                  to="/profile"
+                  className="text-[#237227] hover:text-[#FFAA00] transition"
+                >
+                  <UserCircle size={28} />
+                </Link>
+
+                <button
+                  onClick={handleLogout}
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-red-500 rounded-full hover:opacity-90 transition"
+                >
+                  <LogOut size={16} />
+                  Logout
+                </button>
+              </>
+            )}
           </div>
 
-          {/* Mobile Menu Button */}
+          {/* Mobile Toggle */}
           <button
             onClick={() => setIsOpen(!isOpen)}
-            className="md:hidden p-2 rounded-lg text-slate-700 hover:bg-slate-100 transition-colors duration-200"
+            className="md:hidden text-[#237227]"
           >
-            {isOpen ? <X size={22} /> : <Menu size={22} />}
+            {isOpen ? <X size={24} /> : <Menu size={24} />}
           </button>
         </div>
       </div>
 
       {/* Mobile Menu */}
-      <div
-        className={`md:hidden overflow-hidden transition-all duration-300 ease-in-out ${
-          isOpen ? "max-h-[500px] opacity-100" : "max-h-0 opacity-0"
-        }`}
-      >
-        <div className="px-4 pt-2 pb-5 bg-white border-t border-slate-100 space-y-1">
-          {navLinks.map(({ label, to }) => {
-            const isActive = location.pathname === to;
-            return (
+      {isOpen && (
+        <div className="md:hidden bg-white border-t border-[#237227]">
+          <div className="px-4 py-4 space-y-4">
+            {navLinks.map(({ label, to }) => (
               <Link
                 key={label}
                 to={to}
-                className={`flex items-center justify-between px-4 py-3 rounded-xl text-sm font-medium transition-all duration-200 ${
-                  isActive
-                    ? "text-[#237227] bg-green-50"
-                    : "text-slate-600 hover:bg-slate-50 hover:text-slate-900"
-                }`}
+                className="block text-sm font-semibold text-[#237227] hover:text-[#FFAA00] transition"
               >
                 {label}
-                <ChevronRight
-                  size={16}
-                  className={`transition-colors ${
-                    isActive ? "text-[#237227]" : "text-slate-300"
-                  }`}
-                />
               </Link>
-            );
-          })}
-          <div className="pt-3 flex flex-col gap-2">
-            <Link
-              to="/login"
-              className="w-full text-center px-4 py-2.5 text-sm font-semibold text-white bg-[#237227] rounded-xl hover:bg-green-700 transition-all duration-300"
-            >
-              Login
-            </Link>
+            ))}
+
+            {!isLogin ? (
+              <>
+                <Link
+                  to="/login"
+                  className="block text-sm font-semibold text-[#237227] border-2 border-[#237227] px-4 py-2 rounded-lg text-center"
+                >
+                  Login
+                </Link>
+
+                <Link
+                  to="/signup"
+                  className="block text-sm font-semibold text-white bg-[#FFAA00] px-4 py-2 rounded-lg text-center"
+                >
+                  Signup
+                </Link>
+              </>
+            ) : (
+              <>
+                <Link
+                  to="/admin"
+                  onClick={handleDashboardClick}
+                  className="block text-sm font-semibold text-white bg-[#237227] px-4 py-2 rounded-lg text-center"
+                >
+                  Dashboard
+                </Link>
+
+                <Link
+                  to="/profile"
+                  className="block text-sm font-semibold text-[#237227] text-center"
+                >
+                  Profile
+                </Link>
+
+                <button
+                  onClick={handleLogout}
+                  className="block w-full text-sm font-semibold text-white bg-red-500 px-4 py-2 rounded-lg text-center"
+                >
+                  Logout
+                </button>
+              </>
+            )}
           </div>
         </div>
-      </div>
+      )}
     </nav>
   );
 }

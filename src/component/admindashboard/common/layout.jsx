@@ -1,14 +1,15 @@
 import { useState } from "react";
 import GlobalSidebar from "./Sidebar";
 import GlobalTopbar from "./Topbar";
-import { LogOut, User, Settings, LayoutDashboard, Map, Star, Users } from "lucide-react";
+import { LogOut, User, Settings, LayoutDashboard, Map, Star, Users, Ticket } from "lucide-react";
 
 const ADMIN_MENU_ITEMS = [
   { name: "Overview", href: "/admin/overview", icon: LayoutDashboard },
   { name: "Profile", href: "/admin/profile", icon: User },
   { name: "Tours", href: "/admin/tours", icon: Map },
   { name: "Review", href: "/admin/review", icon: Star },
-  { name: "Setting", href: "/admin/setting", icon: Settings },
+  { name: "Booked-tour", href: "/admin/booked-tour", icon: Star },
+  { name: "User-Tours", href: "/admin/user-tours", icon: Ticket },
   { name: "User", href: "/admin/user", icon: Users },
 ];
 
