@@ -231,7 +231,7 @@ function OurAllServices() {
                 key={service.id}
                 data-aos="fade-up"
                 data-aos-delay={idx * 50}
-                className="group bg-white rounded-2xl overflow-hidden border border-slate-100 hover:border-green-100 hover:shadow-2xl hover:shadow-green-50 transition-all duration-500 flex flex-col h-full"
+                className="group bg-white shadow-2xl rounded-2xl overflow-hidden border border-slate-100 hover:border-green-100 hover:shadow-2xl hover:shadow-green-50 transition-all duration-500 flex flex-col h-full"
               >
                 <div className="relative overflow-hidden h-44">
                   <img
@@ -256,12 +256,7 @@ function OurAllServices() {
                     {service.description}
                   </p>
 
-                  <button className="inline-flex items-center text-xs font-bold text-[#237227] hover:text-[#FFAA00] transition-all group/btn">
-                    Learn More
-                    <svg className="w-4 h-4 ml-2 transition-transform group-hover/btn:translate-x-1" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                      <path strokeLinecap="round" strokeLinejoin="round" strokeWidth={2} d="M14 5l7 7m0 0l-7 7m7-7H3" />
-                    </svg>
-                  </button>
+                
                 </div>
               </div>
             ))}

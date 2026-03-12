@@ -9,7 +9,7 @@ const TourHeader = () => {
   }, []);
 
   return (
-    <section className="relative min-h-screen flex items-center justify-center bg-linear-to-br from-slate-900 via-slate-800 to-slate-900 overflow-hidden pt-20">
+    <section className="relative min-h-screen flex items-center justify-center bg-[#237227] overflow-hidden pt-20">
       {/* Decorative Background Elements */}
       <div className="absolute inset-0 z-0">
         <div className="absolute top-20 right-20 w-96 h-96 bg-green-500/10 rounded-full blur-3xl"></div>
@@ -47,21 +47,6 @@ const TourHeader = () => {
           >
             Explore breathtaking destinations across Pakistan. From stunning mountain ranges to cultural heritage sites, find the perfect tour for your next unforgettable journey.
           </p>
-
-          {/* CTA Buttons */}
-          <div
-            data-aos="fade-up"
-            data-aos-delay="300"
-            className="flex gap-4 justify-center pt-4"
-          >
-            <button className="group px-8 py-3 sm:py-4 bg-linear-to-r from-green-500 to-emerald-600 hover:from-green-600 hover:to-emerald-700 text-white font-bold rounded-lg transition-all duration-300 shadow-lg hover:shadow-xl flex items-center gap-2">
-              Explore Tours
-              <ChevronRight className="w-5 h-5 group-hover:translate-x-1 transition-transform" />
-            </button>
-            <button className="px-8 py-3 sm:py-4 border-2 border-slate-400 text-slate-300 hover:border-green-500 hover:text-green-400 font-bold rounded-lg transition-all duration-300 hover:bg-green-500/5">
-              Watch Demo
-            </button>
-          </div>
 
           {/* Stats */}
           <div

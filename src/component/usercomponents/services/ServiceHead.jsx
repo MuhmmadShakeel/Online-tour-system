@@ -68,20 +68,7 @@ function ServiceHead() {
               </div>
             </div>
 
-            {/* CTA */}
-            <div
-              className="flex flex-wrap gap-3 pt-1"
-              data-aos="fade-up"
-              data-aos-delay="600"
-            >
-              <button className="px-5 py-2 bg-[#237227] text-white rounded-full shadow-lg hover:shadow-green-100 hover:scale-105 transition-all duration-300 font-bold text-xs">
-                Explore Services
-              </button>
-
-              <button className="px-5 py-2 border border-slate-200 text-slate-600 rounded-full hover:bg-slate-50 transition-all duration-300 font-bold text-xs">
-                Watch Demo
-              </button>
-            </div>
+         
           </div>
 
           {/* RIGHT IMAGE */}

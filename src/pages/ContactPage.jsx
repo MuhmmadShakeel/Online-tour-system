@@ -4,7 +4,7 @@ import ContactHeader from '../component/usercomponents/contact/ContactHeader'
 
 function ContactPage() {
   return (
-    <div>
+    <div className='overflow-hidden' >
       <ContactHeader />
       <ContactUs/>
     </div>
