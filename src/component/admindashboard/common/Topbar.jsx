@@ -1,37 +1,12 @@
-import { useState, useRef, useEffect } from "react";
-import {
-  Menu,
-  Bell,
-  Search,
-  ChevronDown,
-} from "lucide-react";
-import { Link } from "react-router-dom";
+import React from "react";
+import { Menu, Bell } from "lucide-react";
+import { useGetUserQuery } from "../../../redux/api/UserApi";
 
-export default function GlobalTopbar({
-  onMenuClick,
-  collapsed = false,
-  searchPlaceholder,
-  userProfile,
-  dropdownItems,
-  showNotifications = true,
-}) {
-  const [dropdownOpen, setDropdownOpen] = useState(false);
-  const dropdownRef = useRef(null);
+export default function GlobalTopbar({ onMenuClick, collapsed = false, searchPlaceholder }) {
+  // Fetch the logged-in user
+  const { data, isLoading } = useGetUserQuery();
 
-  useEffect(() => {
-    const handleClickOutside = (event) => {
-      if (
-        dropdownRef.current &&
-        !dropdownRef.current.contains(event.target)
-      ) {
-        setDropdownOpen(false);
-      }
-    };
-
-    document.addEventListener("mousedown", handleClickOutside);
-    return () =>
-      document.removeEventListener("mousedown", handleClickOutside);
-  }, []);
+  const user = data?.user;
 
   return (
     <header
@@ -41,6 +16,7 @@ export default function GlobalTopbar({
     >
       {/* Left Section */}
       <div className="flex items-center gap-4">
+        {/* Menu button for mobile */}
         <button
           onClick={onMenuClick}
           className="lg:hidden p-2 hover:bg-gray-100 rounded-lg transition-colors cursor-pointer"
@@ -52,7 +28,6 @@ export default function GlobalTopbar({
         {/* Search */}
         {searchPlaceholder && (
           <div className="hidden md:flex items-center bg-gray-100 border border-gray-200 rounded-full px-4 py-1.5 focus-within:ring-2 focus-within:ring-[#237227]/40 transition-all">
-            <Search size={18} className="text-[#1D3557]/60" />
             <input
               type="text"
               placeholder={searchPlaceholder}
@@ -65,100 +40,38 @@ export default function GlobalTopbar({
       {/* Right Section */}
       <div className="flex items-center gap-3 sm:gap-5">
         {/* Notifications */}
-        {showNotifications && (
-          <button className="relative p-2 hover:bg-gray-100 rounded-full transition-all cursor-pointer">
-            <Bell size={22} className="text-[#1D3557]" />
-            <span className="absolute top-2 right-2 w-2 h-2 bg-[#FFAA00] rounded-full"></span>
-          </button>
-        )}
+        <button className="relative p-2 hover:bg-gray-100 rounded-full transition-all cursor-pointer">
+          <Bell size={22} className="text-[#1D3557]" />
+          <span className="absolute top-2 right-2 w-2 h-2 bg-[#FFAA00] rounded-full"></span>
+        </button>
 
         <div className="h-8 w-px bg-gray-200 hidden sm:block" />
 
-        {/* Profile Dropdown */}
-        <div className="relative" ref={dropdownRef}>
-          <button
-            onClick={() => setDropdownOpen(!dropdownOpen)}
-            className="flex items-center gap-3 p-1 pr-2 hover:bg-gray-100 rounded-full transition-all cursor-pointer"
-          >
-            <div className="w-9 h-9 rounded-full bg-[#1D3557] text-white flex items-center justify-center font-bold">
-              {userProfile.initials}
+        {/* User Profile */}
+        {isLoading ? (
+          <div className="flex items-center gap-2">
+            <div className="w-9 h-9 rounded-full bg-gray-300 animate-pulse" />
+            <div className="hidden sm:flex flex-col gap-1">
+              <div className="w-20 h-3 bg-gray-300 animate-pulse rounded" />
+              <div className="w-14 h-2 bg-gray-200 animate-pulse rounded" />
             </div>
-
-            <div className="hidden sm:block text-left">
-              <p className="text-sm font-medium text-[#1D3557] leading-none">
-                {userProfile.name}
-              </p>
-              {userProfile.subtext && (
-                <div className="text-[10px] text-gray-400 mt-1 font-semibold">
-                  {userProfile.subtext}
-                </div>
-              )}
-            </div>
-
-            <ChevronDown
-              size={16}
-              className={`text-gray-400 transition-transform duration-200 ${
-                dropdownOpen ? "rotate-180" : ""
-              }`}
+          </div>
+        ) : (
+          <div className="flex items-center gap-3 p-2 rounded-full hover:bg-gray-100 transition cursor-pointer">
+            {/* Profile Image */}
+            <img
+              src={user?.profileImage?.url || "https://i.pravatar.cc/300"}
+              alt="Profile"
+              className="w-9 h-9 rounded-full object-cover border-2 border-indigo-500"
             />
-          </button>
 
-          {/* Dropdown Menu */}
-          {dropdownOpen && (
-            <div className="absolute right-0 mt-2 w-56 bg-white rounded-xl shadow-lg border border-gray-100 py-1 animate-in fade-in slide-in-from-top-2">
-              <div className="px-4 py-3 border-b border-gray-100 sm:hidden">
-                <p className="text-sm font-medium text-[#1D3557]">{userProfile.name}</p>
-                {userProfile.email && (
-                  <p className="text-xs text-gray-500">{userProfile.email}</p>
-                )}
-              </div>
-              
-              {dropdownItems.map((item, index) => {
-                const Icon = item.icon;
-                const isDanger = item.variant === "danger";
-                
-                const content = (
-                  <>
-                    <Icon size={18} className={isDanger ? "text-[#237227]" : "text-[#1D3557]"} />
-                    {item.label}
-                  </>
-                );
-
-                const className = `w-full flex items-center gap-3 px-4 py-2.5 text-sm transition-colors ${
-                  isDanger 
-                    ? "text-[#237227] hover:bg-green-50 font-medium" 
-                    : "text-[#1D3557] hover:bg-gray-50"
-                }`;
-
-                if (item.href) {
-                  return (
-                    <Link
-                      key={index}
-                      to={item.href}
-                      className={className}
-                      onClick={() => setDropdownOpen(false)}
-                    >
-                      {content}
-                    </Link>
-                  );
-                }
-
-                return (
-                  <button
-                    key={index}
-                    className={className}
-                    onClick={() => {
-                      item.onClick?.();
-                      setDropdownOpen(false);
-                    }}
-                  >
-                    {content}
-                  </button>
-                );
-              })}
+            {/* Name & Role */}
+            <div className="hidden sm:flex flex-col">
+              <p className="text-sm font-medium text-[#1D3557]">{user?.name || "Admin"}</p>
+              <span className="text-xs text-gray-400">{user?.role || "Administrator"}</span>
             </div>
-          )}
-        </div>
+          </div>
+        )}
       </div>
     </header>
   );

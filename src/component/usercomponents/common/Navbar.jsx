@@ -11,6 +11,7 @@ import {
 import toast from "react-hot-toast";
 import { useLogoutMutation } from "../../../redux/api/AuthApi";
 import { ContextStore } from "../../../context/Context";
+import { useGetUserQuery } from "../../../redux/api/UserApi";
 
 const navLinks = [
   { label: "Home", to: "/" },
@@ -21,6 +22,7 @@ const navLinks = [
 ];
 
 function Navbar() {
+
   const [isOpen, setIsOpen] = useState(false);
 
   const location = useLocation();
@@ -30,17 +32,28 @@ function Navbar() {
 
   const [logoutApi] = useLogoutMutation();
 
+  /* GET USER PROFILE */
+
+  const userId = localStorage.getItem("userId");
+
+  const { data } = useGetUserQuery(userId, {
+    skip: !userId
+  });
+
+  const profileImage = data?.user?.profileImage?.url;
+
   useEffect(() => {
     setIsOpen(false);
   }, [location.pathname]);
 
-  
   const handleLogout = async () => {
     try {
+
       await logoutApi().unwrap();
 
       localStorage.removeItem("token");
       localStorage.removeItem("user");
+      localStorage.removeItem("userId");
 
       setIsLogin(false);
       setUser(null);
@@ -48,8 +61,11 @@ function Navbar() {
       toast.success("Logged out successfully");
 
       navigate("/", { replace: true });
+
     } catch (error) {
+
       toast.error("Logout failed. Please try again.");
+
     }
   };
 
@@ -75,6 +91,7 @@ function Navbar() {
           {/* Desktop Links */}
           <div className="hidden md:flex items-center gap-6">
             {navLinks.map(({ label, to }) => {
+
               const isActive = location.pathname === to;
 
               return (
@@ -123,12 +140,25 @@ function Navbar() {
                   Manage Account
                 </Link>
 
-                {/* Profile */}
+                {/* Profile Icon */}
                 <Link
                   to="/profile"
-                  className="text-[#237227] hover:text-[#FFAA00] transition"
+                  className="flex items-center justify-center"
                 >
-                  <UserCircle size={28} />
+
+                  {profileImage ? (
+                    <img
+                      src={profileImage}
+                      alt="profile"
+                      className="w-9 h-9 rounded-full object-cover border-2 border-[#237227] hover:border-[#FFAA00] transition"
+                    />
+                  ) : (
+                    <UserCircle
+                      size={28}
+                      className="text-[#237227] hover:text-[#FFAA00] transition"
+                    />
+                  )}
+
                 </Link>
 
                 {/* Logout */}
@@ -216,6 +246,7 @@ function Navbar() {
 
         </div>
       )}
+
     </nav>
   );
 }

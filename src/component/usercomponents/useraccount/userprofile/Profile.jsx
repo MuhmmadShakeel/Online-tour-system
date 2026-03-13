@@ -26,6 +26,7 @@ const [modalType,setModalType] = useState(null)
 
 const [form,setForm] = useState({
 name:"",
+role:"",
 file:null
 })
 
@@ -40,6 +41,7 @@ if(modalType==="edit" && user){
 
 setForm({
 name:user.name,
+role:user.role,
 file:null
 })
 
@@ -82,6 +84,7 @@ setModalType(null)
 
 setForm({
 name:"",
+role:"",
 file:null
 })
 
@@ -99,6 +102,7 @@ try{
 const formData=new FormData()
 
 formData.append("name",form.name)
+formData.append("role",form.role)
 
 if(form.file){
 formData.append("profileImage",form.file)
@@ -130,6 +134,7 @@ try{
 const formData=new FormData()
 
 formData.append("name",form.name)
+formData.append("role",form.role)
 
 if(form.file){
 formData.append("profileImage",form.file)
@@ -241,6 +246,14 @@ className="w-full h-full object-cover"
 
 </h2>
 
+{/* ROLE DISPLAY */}
+
+<p className="text-sm text-gray-500 mt-1 capitalize">
+
+{user?.role}
+
+</p>
+
 </div>
 
 
@@ -304,6 +317,21 @@ onChange={handleChange}
 placeholder="Enter name"
 className="w-full border p-2 rounded"
 />
+
+{/* ROLE INPUT */}
+
+<select
+name="role"
+value={form.role}
+onChange={handleChange}
+className="w-full border p-2 rounded"
+>
+
+<option value="">Select Role</option>
+<option value="User">User</option>
+<option value="Admin">Admin</option>
+
+</select>
 
 <input type="file" onChange={handleFile}/>
 

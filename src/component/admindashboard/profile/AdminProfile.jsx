@@ -65,6 +65,7 @@ function AdminProfile() {
       const formData = new FormData()
 
       formData.append("name", name)
+      formData.append("role", role)
 
       if (file) {
         formData.append("profileImage", file)
@@ -95,6 +96,7 @@ function AdminProfile() {
       const formData = new FormData()
 
       formData.append("name", name)
+      formData.append("role", role)
 
       if (file) {
         formData.append("profileImage", file)
@@ -162,7 +164,7 @@ function AdminProfile() {
 
   return (
 
-    <div className="min-h-screen flex justify-center items-start bg-gray-100 pt-16 px-4">
+    <div className="min-h-screen flex justify-center items-start bg-gray-100 pt-20 px-4">
 
       <div className="w-full max-w-md bg-white rounded-2xl shadow-lg border border-gray-200 p-6">
 
@@ -230,26 +232,27 @@ function AdminProfile() {
 
           {/* ROLE */}
 
-          {user && (
+          <div>
 
-            <div>
+            <label className="block text-gray-600 text-sm mb-1">
+              Role
+            </label>
 
-              <label className="block text-gray-600 text-sm mb-1">
-                Role
-              </label>
+            <input
+              type="text"
+              value={role}
+              disabled={user && !editMode}
+              onChange={(e) => setRole(e.target.value)}
+              className={`w-full border px-4 py-2 rounded-lg focus:outline-none
+              ${(user && !editMode)
+                ? "bg-gray-100 border-gray-200 text-gray-500"
+                : "bg-white border-gray-300 text-gray-800"
+              }`}
+            />
 
-              <input
-                type="text"
-                value={role}
-                disabled
-                className="w-full bg-gray-100 border border-gray-200 text-gray-500 px-4 py-2 rounded-lg"
-              />
+          </div>
 
-            </div>
-
-          )}
-
-          {/* CREATE PROFILE */}
+          {/* CREATE */}
 
           {!user && (
 
@@ -262,7 +265,7 @@ function AdminProfile() {
 
           )}
 
-          {/* EDIT PROFILE */}
+          {/* EDIT */}
 
           {user && !editMode && (
 
@@ -294,6 +297,7 @@ function AdminProfile() {
                 onClick={() => {
                   setEditMode(false)
                   setName(user.name)
+                  setRole(user.role)
                   setPreview(user?.profileImage?.url)
                 }}
                 className="flex-1 bg-gray-400 hover:bg-gray-500 text-white py-2.5 rounded-lg font-semibold transition"
