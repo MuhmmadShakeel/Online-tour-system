@@ -18,7 +18,8 @@ function AdminAllTours() {
   const [showEdit, setShowEdit] = useState(false);
   const [selectedTour, setSelectedTour] = useState(null);
 
-  const [formData, setFormData] = useState({
+  // Initial empty form data
+  const emptyFormData = {
     title: "",
     description: "",
     location: "",
@@ -26,9 +27,19 @@ function AdminAllTours() {
     duration: "",
     startDate: "",
     image: null,
-  });
+  };
+
+  const [formData, setFormData] = useState(emptyFormData);
 
   const [search, setSearch] = useState("");
+
+  // Predefined cities and their prices
+  const cityOptions = [
+    { name: "Paris", price: 899 },
+    { name: "London", price: 799 },
+    { name: "New York", price: 1299 },
+    { name: "Tokyo", price: 1499 },
+  ];
 
   const filteredTours = useMemo(
     () =>
@@ -41,26 +52,35 @@ function AdminAllTours() {
   const handleChange = (e) => {
     if (e.target.name === "image") {
       setFormData({ ...formData, image: e.target.files[0] });
+    } else if (e.target.name === "location") {
+      // When location changes, automatically set the price
+      const selectedCity = cityOptions.find(city => city.name === e.target.value);
+      setFormData({ 
+        ...formData, 
+        location: e.target.value,
+        price: selectedCity ? selectedCity.price : ""
+      });
     } else {
       setFormData({ ...formData, [e.target.name]: e.target.value });
     }
   };
 
+  const handleCreateOpen = () => {
+    setFormData(emptyFormData); // Reset to empty form
+    setShowCreate(true);
+  };
+
   const handleCreate = async (e) => {
     e.preventDefault();
     const data = new FormData();
-    Object.keys(formData).forEach((key) => data.append(key, formData[key]));
+    Object.keys(formData).forEach((key) => {
+      if (formData[key] !== null && formData[key] !== "") {
+        data.append(key, formData[key]);
+      }
+    });
     await createTour(data);
     setShowCreate(false);
-    setFormData({
-      title: "",
-      description: "",
-      location: "",
-      price: "",
-      duration: "",
-      startDate: "",
-      image: null,
-    });
+    setFormData(emptyFormData);
   };
 
   const handleEditOpen = (tour) => {
@@ -81,7 +101,9 @@ function AdminAllTours() {
     e.preventDefault();
     const data = new FormData();
     Object.keys(formData).forEach((key) => {
-      if (formData[key]) data.append(key, formData[key]);
+      if (formData[key] !== null && formData[key] !== "") {
+        data.append(key, formData[key]);
+      }
     });
     await updateTour({ id: selectedTour._id, formData: data });
     setShowEdit(false);
@@ -117,7 +139,7 @@ function AdminAllTours() {
 
           {/* Create Button */}
           <button
-            onClick={() => setShowCreate(true)}
+            onClick={handleCreateOpen}
             className="mt-2 sm:mt-0 bg-indigo-600 hover:bg-indigo-500 text-white px-4 py-2 rounded-lg transition"
           >
             + Create Tour
@@ -244,6 +266,7 @@ function AdminAllTours() {
           handleChange={handleChange}
           handleSubmit={handleCreate}
           close={() => setShowCreate(false)}
+          cityOptions={cityOptions}
         />
       )}
       {showEdit && (
@@ -253,6 +276,7 @@ function AdminAllTours() {
           handleChange={handleChange}
           handleSubmit={handleUpdate}
           close={() => setShowEdit(false)}
+          cityOptions={cityOptions}
         />
       )}
 
@@ -263,7 +287,7 @@ function AdminAllTours() {
 export default AdminAllTours;
 
 /* ---------------- MODAL COMPONENT ---------------- */
-function Modal({ title, formData, handleChange, handleSubmit, close }) {
+function Modal({ title, formData, handleChange, handleSubmit, close, cityOptions }) {
   return (
     <div className="fixed inset-0 bg-black/40 flex justify-center items-center z-50 px-4">
       <div className="bg-white p-6 rounded-lg w-full max-w-md shadow-lg">
@@ -274,62 +298,88 @@ function Modal({ title, formData, handleChange, handleSubmit, close }) {
             value={formData.title}
             onChange={handleChange}
             placeholder="Title"
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            required
           />
-          <input
+          
+          {/* Location Dropdown */}
+          <select
             name="location"
             value={formData.location}
             onChange={handleChange}
-            placeholder="Location"
-            className="w-full border p-2 rounded"
-          />
-          <input
-            name="price"
-            value={formData.price}
-            onChange={handleChange}
-            placeholder="Price"
-            type="number"
-            className="w-full border p-2 rounded"
-          />
+            className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            required
+          >
+            <option value="">Select a city</option>
+            {cityOptions.map((city) => (
+              <option key={city.name} value={city.name}>
+                {city.name}
+              </option>
+            ))}
+          </select>
+
+          {/* Price Input (Auto-filled but can be modified) */}
+          <div className="relative">
+            <input
+              name="price"
+              value={formData.price}
+              onChange={handleChange}
+              placeholder="Price"
+              type="number"
+              className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
+              required
+            />
+            {formData.location && (
+              <p className="text-xs text-gray-500 mt-1">
+                Base price for {formData.location}
+              </p>
+            )}
+          </div>
+
           <input
             name="duration"
             value={formData.duration}
             onChange={handleChange}
-            placeholder="Duration"
+            placeholder="Duration (days)"
             type="number"
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            required
           />
           <input
             name="startDate"
             value={formData.startDate}
             onChange={handleChange}
             type="date"
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            required
           />
           <textarea
             name="description"
             value={formData.description}
             onChange={handleChange}
             placeholder="Description"
-            className="w-full border p-2 rounded"
+            className="w-full border p-2 rounded focus:outline-none focus:ring-2 focus:ring-indigo-400"
+            rows="3"
+            required
           />
           <input
             name="image"
             type="file"
             onChange={handleChange}
             className="w-full"
+            accept="image/*"
           />
           <div className="flex justify-end gap-2 pt-2 flex-wrap">
             <button
               type="button"
               onClick={close}
-              className="px-4 py-2 bg-gray-400 text-white rounded"
+              className="px-4 py-2 bg-gray-400 hover:bg-gray-500 text-white rounded transition"
             >
               Cancel
             </button>
             <button
               type="submit"
-              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded"
+              className="px-4 py-2 bg-indigo-600 hover:bg-indigo-500 text-white rounded transition"
             >
               Save
             </button>

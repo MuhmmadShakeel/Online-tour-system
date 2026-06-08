@@ -25,6 +25,14 @@ function CreatedTour() {
 
   const tours = data?.tours || [];
 
+  // Predefined cities and their prices
+  const cityOptions = [
+    { name: "Paris", price: 899 },
+    { name: "London", price: 799 },
+    { name: "New York", price: 1299 },
+    { name: "Tokyo", price: 1499 },
+  ];
+
   // FORM STATE
   const [showForm, setShowForm] = useState(false);
   const [newTour, setNewTour] = useState({
@@ -47,6 +55,26 @@ function CreatedTour() {
     date: "",
     image: null,
   });
+
+  // Handle location change for new tour
+  const handleNewTourLocationChange = (e) => {
+    const selectedCity = cityOptions.find(city => city.name === e.target.value);
+    setNewTour({ 
+      ...newTour, 
+      location: e.target.value,
+      price: selectedCity ? selectedCity.price.toString() : ""
+    });
+  };
+
+  // Handle location change for editing tour
+  const handleEditTourLocationChange = (e) => {
+    const selectedCity = cityOptions.find(city => city.name === e.target.value);
+    setEditingTour({ 
+      ...editingTour, 
+      location: e.target.value,
+      price: selectedCity ? selectedCity.price.toString() : editingTour.price
+    });
+  };
 
   // CREATE TOUR
   const handleAddTour = async () => {
@@ -181,28 +209,41 @@ function CreatedTour() {
                   : setNewTour({ ...newTour, description: e.target.value })
               }
             />
-            <input
-              type="text"
-              placeholder="Location"
+            
+            {/* Location Dropdown */}
+            <select
               className="w-full border p-2 rounded"
               value={editingId ? editingTour.location : newTour.location}
-              onChange={(e) =>
-                editingId
-                  ? setEditingTour({ ...editingTour, location: e.target.value })
-                  : setNewTour({ ...newTour, location: e.target.value })
-              }
-            />
-            <input
-              type="number"
-              placeholder="Price"
-              className="w-full border p-2 rounded"
-              value={editingId ? editingTour.price : newTour.price}
-              onChange={(e) =>
-                editingId
-                  ? setEditingTour({ ...editingTour, price: e.target.value })
-                  : setNewTour({ ...newTour, price: e.target.value })
-              }
-            />
+              onChange={editingId ? handleEditTourLocationChange : handleNewTourLocationChange}
+            >
+              <option value="">Select a city</option>
+              {cityOptions.map((city) => (
+                <option key={city.name} value={city.name}>
+                  {city.name}
+                </option>
+              ))}
+            </select>
+
+            {/* Price Input with auto-fill */}
+            <div>
+              <input
+                type="number"
+                placeholder="Price"
+                className="w-full border p-2 rounded"
+                value={editingId ? editingTour.price : newTour.price}
+                onChange={(e) =>
+                  editingId
+                    ? setEditingTour({ ...editingTour, price: e.target.value })
+                    : setNewTour({ ...newTour, price: e.target.value })
+                }
+              />
+              {(editingId ? editingTour.location : newTour.location) && (
+                <p className="text-xs text-gray-500 mt-1">
+                  Base price for {(editingId ? editingTour.location : newTour.location)}
+                </p>
+              )}
+            </div>
+
             <input
               type="number"
               placeholder="Duration (days)"
@@ -321,5 +362,4 @@ function CreatedTour() {
     </div>
   );
 }
-
 export default CreatedTour;

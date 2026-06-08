@@ -4,7 +4,7 @@ export const reviewsApi = createApi({
   reducerPath: "reviewsApi",
 
   baseQuery: fetchBaseQuery({
-    baseUrl: "http://localhost:5000/api/reviews",
+    baseUrl: "http://localhost:5000/api", // ✅ clean base URL
 
     prepareHeaders: (headers) => {
       const token = localStorage.getItem("token");
@@ -20,20 +20,19 @@ export const reviewsApi = createApi({
   tagTypes: ["Reviews"],
 
   endpoints: (builder) => ({
-
-    // ADD REVIEW
+    // ✅ ADD REVIEW
     addReview: builder.mutation({
       query: (formData) => ({
-        url: "/addreview",
+        url: "/reviews/addreview",
         method: "POST",
         body: formData,
       }),
-      invalidatesTags: ["Reviews"],
+      invalidatesTags: [{ type: "Reviews", id: "LIST" }],
     }),
 
-    // GET REVIEWS
+    // ✅ GET REVIEWS
     getReviews: builder.query({
-      query: () => "/getreview",
+      query: () => "/reviews/getreview",
 
       providesTags: (result) =>
         result?.addedreviews
@@ -47,10 +46,10 @@ export const reviewsApi = createApi({
           : [{ type: "Reviews", id: "LIST" }],
     }),
 
-    // DELETE REVIEW
+    // ✅ DELETE REVIEW
     deleteReview: builder.mutation({
       query: (id) => ({
-        url: `/deletereview/${id}`,
+        url: `/reviews/deletereview/${id}`,
         method: "DELETE",
       }),
 
@@ -59,7 +58,6 @@ export const reviewsApi = createApi({
         { type: "Reviews", id: "LIST" },
       ],
     }),
-
   }),
 });
 
