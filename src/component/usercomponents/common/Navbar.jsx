@@ -6,7 +6,8 @@ import {
   Globe,
   UserCircle,
   LogOut,
-  Settings
+  Settings,
+  Shield
 } from "lucide-react";
 import toast from "react-hot-toast";
 import { useLogoutMutation } from "../../../redux/api/AuthApi";
@@ -140,6 +141,14 @@ function Navbar() {
                   Manage Account
                 </Link>
 
+                <Link
+                  to="/admin"
+                  className="flex items-center gap-2 px-4 py-2 text-sm font-semibold text-white bg-[#1a1a2e] rounded-full hover:opacity-90 transition shadow-lg shadow-[#1a1a2e]/30 border border-[#FFAA00]/30"
+                >
+                  <Shield size={16} />
+                  Admin
+                </Link>
+
                 {/* Profile Icon */}
                 <Link
                   to="/profile"
@@ -224,6 +233,13 @@ function Navbar() {
                   className="block text-sm font-semibold text-white bg-[#237227] px-4 py-2 rounded-lg text-center"
                 >
                   Manage Account
+                </Link>
+
+                <Link
+                  to="/admin"
+                  className="block text-sm font-semibold text-[#1a1a2e] bg-white border-2 border-[#FFAA00] px-4 py-2 rounded-lg text-center shadow-md"
+                >
+                  Admin Panel
                 </Link>
 
                 <Link

@@ -17,7 +17,7 @@ export const adminTourApi = createApi({
     },
   }),
 
-  tagTypes: ["AdminTours", "SingleTour", "BookedTour"],
+  tagTypes: ["AdminTours", "SingleTour", "Booking"],
 
   endpoints: (builder) => ({
 
@@ -79,30 +79,38 @@ export const adminTourApi = createApi({
       ],
     }),
 
-    /* ================= BOOKINGS MANAGEMENT ================= */
 
-    // GET USERS WHO BOOKED A SPECIFIC TOUR
     getBookedTour: builder.query({
       query: (id) => `/bookedtour/${id}`,
-      providesTags: ["BookedTour"],
+      providesTags: (result, error, id) => [{ type: "Booking", id }],
     }),
 
-    // GET ALL BOOKINGS (ADMIN DASHBOARD)
     getAllBookedTours: builder.query({
       query: () => ({
         url: "/admin/all-bookings",
         method: "GET",
       }),
-      providesTags: ["BookedTour"],
+      providesTags: (result) =>
+        result?.bookings
+          ? [
+              ...result.bookings.map((booking) => ({
+                type: "Booking",
+                id: booking._id,
+              })),
+              { type: "Booking", id: "LIST" },
+            ]
+          : [{ type: "Booking", id: "LIST" }],
     }),
 
-    // DELETE ALL BOOKINGS OF A TOUR
     deleteTourBookingsAdmin: builder.mutation({
       query: (tourId) => ({
         url: `/admin/bookings/${tourId}`,
         method: "DELETE",
       }),
-      invalidatesTags: ["BookedTour"],
+      invalidatesTags: (result, error, tourId) => [
+        { type: "Booking", id: tourId },
+        { type: "Booking", id: "LIST" },
+      ],
     }),
 
   }),

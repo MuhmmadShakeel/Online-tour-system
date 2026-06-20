@@ -32,7 +32,7 @@ function Overview() {
   const totalUsers = usersData?.data?.length || 0;
   const totalReviews = reviewsData?.addedreviews?.length || 0;
   const totalTours = toursData?.tours?.length || 0;
-  const totalBooked = bookedData?.bookings?.length || 0;
+  const totalBooked = bookedData?.bookings?.length || bookedData?.data?.bookings?.length || 0;
 
   /* ================= LINE CHART DATA ================= */
 
@@ -54,8 +54,10 @@ function Overview() {
 
     const counts = new Array(12).fill(0);
 
-    if (bookedData?.bookings) {
-      bookedData.bookings.forEach((booking) => {
+    const bookings = bookedData?.bookings || bookedData?.data?.bookings || [];
+
+    if (bookings.length) {
+      bookings.forEach((booking) => {
         const date = new Date(booking.createdAt);
         const month = date.getMonth();
         counts[month]++;
