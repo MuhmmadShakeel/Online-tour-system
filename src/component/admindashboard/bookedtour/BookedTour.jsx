@@ -92,7 +92,7 @@ function BookedTour() {
     return (
       <div className="max-w-7xl mx-auto mt-10 p-10 bg-white shadow rounded-xl text-center border border-red-200">
         <div className="text-4xl mb-8">⚠️</div>
-        <p className="text-red-500 text-lg font-medium">
+        <p className="text-red-400 text-lg font-medium">
           Failed to load bookings.
         </p>
         <p className="text-gray-500 text-sm mt-1">
